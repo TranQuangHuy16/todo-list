@@ -1,26 +1,7 @@
 import TaskEmptyState from "./TaskEmptyState";
 import TaskCard from "./TaskCard";
 
-const TaskList = () => {
-  let filter = "all";
-
-  const filterTasks = [
-    {
-      _id: 1,
-      title: "học react",
-      status: "active",
-      completedAt: null,
-      createdAt: new Date(),
-    },
-    {
-      _id: 2,
-      title: "làm bài tập",
-      status: "completed",
-      completedAt: new Date(),
-      createdAt: new Date(),
-    },
-  ];
-
+const TaskList = ({ filterTasks, filter }) => {
   if (!filterTasks || filterTasks.length === 0) {
     return <TaskEmptyState filter={filter} />;
   }
@@ -33,5 +14,4 @@ const TaskList = () => {
     </div>
   );
 };
-
 export default TaskList;

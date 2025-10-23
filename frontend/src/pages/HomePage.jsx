@@ -5,8 +5,46 @@ import Header from "@/components/Header";
 import StatsAndFilters from "@/components/StatsAndFilters";
 import TaskList from "@/components/TaskList";
 import TaskListPagination from "@/components/TaskListPagination";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import axios from "axios";
 
 const HomePage = () => {
+  const [taskBuffer, setTaskBuffer] = useState([]);
+  const [activeTastkCount, setActiveTaskCount] = useState(0);
+  const [completedTaskCount, setCompletedTaskCount] = useState(0);
+  const [filter, setFilter] = useState("all");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  // logic
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get("http://localhost:5001/api/tasks");
+      setTaskBuffer(res.data.tasks);
+      setActiveTaskCount(res.data.activeCount);
+      setCompletedTaskCount(res.data.completedCount);
+      console.log(res.data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      toast.error("Lỗi xảy ra khi truy xuất tasks");
+    }
+  };
+
+  //biến
+  const filteredTasks = taskBuffer.filter((task) => {
+    switch (filter) {
+      case "active":
+        return task.status === "active";
+      case "completed":
+        return task.status === "completed";
+      default:
+        return true;
+    }
+  });
+
   return (
     <div className="min-h-screen w-full bg-[#fefcff] relative">
       {/* Dreamy Sky Pink Glow */}
@@ -28,10 +66,15 @@ const HomePage = () => {
         <AddTask />
 
         {/* thống kê và bộ lọc */}
-        <StatsAndFilters />
+        <StatsAndFilters
+          filter={filter}
+          setFilter={setFilter}
+          activeTasksCount={activeTastkCount}
+          completedTasksCount={completedTaskCount}
+        />
 
         {/* danh sách công việc */}
-        <TaskList />
+        <TaskList filterTasks={filteredTasks} filter={filter} />
 
         {/* phân trang và lọc theo date */}
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row ">
@@ -40,7 +83,10 @@ const HomePage = () => {
         </div>
 
         {/* cuối trang */}
-        <Footer />
+        <Footer
+          activeTasksCount={activeTastkCount}
+          completedTasksCount={completedTaskCount}
+        />
       </div>
     </div>
   );
