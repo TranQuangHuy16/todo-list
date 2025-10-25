@@ -8,6 +8,7 @@ import TaskListPagination from "@/components/TaskListPagination";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
+import api from "@/lib/axios";
 
 const HomePage = () => {
   const [taskBuffer, setTaskBuffer] = useState([]);
@@ -22,7 +23,7 @@ const HomePage = () => {
   // logic
   const fetchTasks = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/tasks");
+      const res = await api.get("/tasks");
       setTaskBuffer(res.data.tasks);
       setActiveTaskCount(res.data.activeCount);
       setCompletedTaskCount(res.data.completedCount);
@@ -45,6 +46,10 @@ const HomePage = () => {
     }
   });
 
+  const handleTaskChange = () => {
+    fetchTasks();
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#fefcff] relative">
       {/* Dreamy Sky Pink Glow */}
@@ -63,7 +68,7 @@ const HomePage = () => {
         <Header />
 
         {/* tạo nhiệm vụ */}
-        <AddTask />
+        <AddTask handleNewTaskAdded={handleTaskChange} />
 
         {/* thống kê và bộ lọc */}
         <StatsAndFilters
@@ -74,7 +79,11 @@ const HomePage = () => {
         />
 
         {/* danh sách công việc */}
-        <TaskList filterTasks={filteredTasks} filter={filter} />
+        <TaskList
+          filterTasks={filteredTasks}
+          filter={filter}
+          handleTaskChanged={handleTaskChange}
+        />
 
         {/* phân trang và lọc theo date */}
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row ">
