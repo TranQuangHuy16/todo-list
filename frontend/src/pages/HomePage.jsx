@@ -15,15 +15,15 @@ const HomePage = () => {
   const [activeTastkCount, setActiveTaskCount] = useState(0);
   const [completedTaskCount, setCompletedTaskCount] = useState(0);
   const [filter, setFilter] = useState("all");
-
+  const [dateQuery, setDateQuery] = useState("all");
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [dateQuery]);
 
   // logic
   const fetchTasks = async () => {
     try {
-      const res = await api.get("/tasks");
+      const res = await api.get(`/tasks?filter=${dateQuery}`);
       setTaskBuffer(res.data.tasks);
       setActiveTaskCount(res.data.activeCount);
       setCompletedTaskCount(res.data.completedCount);
@@ -86,11 +86,10 @@ const HomePage = () => {
         />
 
         {/* phân trang và lọc theo date */}
-        <div className="flex flex-col items-center justify-between gap-6 sm:flex-row ">
+        <div className="w-full max-w-lg mx-auto flex flex-col items-center justify-between gap-6 sm:flex-row mb-5">
           <TaskListPagination />
-          <DateTimeFilter />
+          <DateTimeFilter dateQuery={dateQuery} setDateQuery={setDateQuery} />
         </div>
-
         {/* cuối trang */}
         <Footer
           activeTasksCount={activeTastkCount}
